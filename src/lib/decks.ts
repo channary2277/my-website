@@ -84,7 +84,7 @@ const files = import.meta.glob('../content/decks/*.md', {
   eager: true,
 }) as Record<string, string>;
 
-function parseFrontmatter(raw: string): { data: Record<string, string>; body: string } {
+export function parseFrontmatter(raw: string): { data: Record<string, string>; body: string } {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   if (!match) return { data: {}, body: raw };
   const data: Record<string, string> = {};

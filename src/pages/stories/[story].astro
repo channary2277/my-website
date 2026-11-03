@@ -1,0 +1,74 @@
+---
+// One page for each story in src/content/stories/.
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getStories, type Story } from '../../lib/stories';
+
+export function getStaticPaths() {
+  const stories = getStories();
+  return stories.map((story, i) => ({
+    params: { story: story.slug },
+    props: { story, next: stories[(i + 1) % stories.length] },
+  }));
+}
+
+const { story, next } = Astro.props as { story: Story; next: Story };
+---
+
+<Base title={story.title} description={story.summary}>
+  <Header />
+  <main class="mx-auto max-w-2xl px-4 py-12 sm:px-6 sm:py-20">
+    <a href="/#stories" class="text-sm font-medium text-muted hover:text-brand">← All stories <span lang="km" class="font-khmer">រឿងទាំងអស់</span></a>
+
+    <p class="mt-8 text-6xl" aria-hidden="true">{story.emoji}</p>
+    <h1 class="mt-4 font-display text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
+      {story.title}
+      {story.titleKm && <span class="km" lang="km">{story.titleKm}</span>}
+    </h1>
+
+    <article class="story mt-10 text-lg leading-relaxed" set:html={story.html} />
+
+    {
+      story.moral && (
+        <aside class="mt-12 rounded-2xl border border-sun/40 bg-sun/15 p-6">
+          <p class="font-semibold text-brand">
+            The lesson <span lang="km" class="font-khmer font-normal">· មេរៀន</span>
+          </p>
+          <p class="mt-2 font-display text-xl font-bold">
+            {story.moral}
+            {story.moralKm && <span class="km" lang="km">{story.moralKm}</span>}
+          </p>
+        </aside>
+      )
+    }
+
+    {
+      next.slug !== story.slug && (
+        <a href={`/stories/${next.slug}`} class="mt-12 flex items-center gap-4 rounded-2xl border border-ink/10 bg-white p-5 transition hover:border-brand">
+          <span class="text-4xl" aria-hidden="true">{next.emoji}</span>
+          <span>
+            <span class="block text-sm text-muted">Next story <span lang="km" class="font-khmer">រឿងបន្ទាប់</span></span>
+            <span class="block font-display text-lg font-bold">{next.title} →</span>
+          </span>
+        </a>
+      )
+    }
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .story :global(p) {
+    margin-top: 1.25em;
+  }
+  .story :global(p:first-child)::first-letter {
+    float: left;
+    margin: 0.1em 0.12em 0 0;
+    font-family: var(--font-display);
+    font-size: 3.4em;
+    font-weight: 800;
+    line-height: 0.8;
+    color: var(--color-brand);
+  }
+</style>
